@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lab Bench — by Ibrahem Abdalkader</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: one narrow column of three bench-style instrument panels, header with language switch */
+:root{
+  --bg:#EEF3F5;
+  --panel:#FFFFFF;
+  --fg:#12242C;
+  --muted:#5B7480;
+  --line:#D2DEE3;
+  --accent:#0B6E8E;
+  --accent-fg:#FFFFFF;
+  --result:#E3F2F7;
+  --warn:#B4421F;
+  --font-display:'Space Grotesk','Cairo',system-ui,sans-serif;
+  --font-body:'Inter','Cairo',system-ui,sans-serif;
+  --font-mono:ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1A20; --panel:#15262E; --fg:#E4EEF2; --muted:#8FA9B5; --line:#26404B;
+    --accent:#4FB8D8; --accent-fg:#06222B; --result:#10333F; --warn:#F08A63;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1A20; --panel:#15262E; --fg:#E4EEF2; --muted:#8FA9B5; --line:#26404B;
+  --accent:#4FB8D8; --accent-fg:#06222B; --result:#10333F; --warn:#F08A63;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:var(--font-body); font-size:16px; line-height:1.55;
+  padding-block:20px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+html[lang="ar"] body{font-family:'Cairo','Inter',system-ui,sans-serif}
+.wrap{max-width:980px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--font-display);font-size:1.9rem;margin:0;line-height:1.15;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;max-width:60ch}
+.lang{
+  font:inherit;font-weight:600;color:var(--accent);background:transparent;
+  border:1.5px solid var(--accent);border-radius:8px;padding:8px 16px;cursor:pointer;
+}
+.lang:hover{background:var(--accent);color:var(--accent-fg)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{font-family:var(--font-display);font-size:1.15rem;margin:0}
+.panel p.hint{margin:0;color:var(--muted);font-size:.9rem}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:.82rem;font-weight:600;letter-spacing:.03em;color:var(--muted)}
+.field input{
+  font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);
+  border-radius:8px;padding:10px 12px;width:100%;min-width:0;
+}
+.field input.formula{font-family:var(--font-mono)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.result{
+  background:var(--result);border-radius:10px;padding:14px 16px;
+  display:flex;flex-direction:column;gap:6px;min-height:64px;
+}
+.big{font-family:var(--font-display);font-size:1.7rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.unit{font-size:1rem;font-weight:500;color:var(--muted)}
+.line{font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.err{color:var(--warn);font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+td,th{padding:3px 0;text-align:start;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600}
+td:last-child,th:last-child{text-align:end}
+.btn{
+  font:inherit;font-weight:600;background:var(--accent);color:var(--accent-fg);
+  border:0;border-radius:8px;padding:9px 14px;cursor:pointer;align-self:flex-start;
+}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  font:inherit;font-family:var(--font-mono);font-size:.85rem;color:var(--fg);background:var(--bg);
+  border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;
+}
+.chip:hover{border-color:var(--accent)}
+footer{color:var(--muted);font-size:.85rem}
+.byline{margin:8px 0 0;font-family:var(--font-display);font-size:.8rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.byline b{color:var(--accent);font-weight:700}
+.credit{display:flex;flex-direction:column;gap:4px;padding-top:12px;border-top:1px solid var(--line)}
+.credit strong{color:var(--fg);font-family:var(--font-display);font-weight:700}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="t-title"></h1>
+      <p class="sub" id="t-sub"></p>
+      <p class="byline" dir="ltr">Designed &amp; built by <b>Ibrahem Abdalkader</b></p>
+    </div>
+    <button class="lang" id="langBtn" type="button"></button>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="h-mm">
+      <h2 id="h-mm"></h2>
+      <p class="hint" id="hint-mm"></p>
+      <div class="field">
+        <label for="formula" id="l-formula"></label>
+        <input id="formula" class="formula" value="CuSO4·5H2O" autocomplete="off" spellcheck="false" dir="ltr">
+      </div>
+      <div class="chips" id="chips" dir="ltr"></div>
+      <div class="result" id="out-mm" aria-live="polite"></div>
+      <button class="btn" id="useMM" type="button"></button>
+    </section>
+
+    <section class="panel" aria-labelledby="h-mol">
+      <h2 id="h-mol"></h2>
+      <p class="hint" id="hint-mol"></p>
+      <div class="row2">
+        <div class="field"><label for="mass" id="l-mass"></label><input id="mass" inputmode="decimal" value="5.844" dir="ltr"></div>
+        <div class="field"><label for="mm" id="l-mm"></label><input id="mm" inputmode="decimal" value="58.44" dir="ltr"></div>
+      </div>
+      <div class="field"><label for="vol" id="l-vol"></label><input id="vol" inputmode="decimal" value="100" dir="ltr"></div>
+      <div class="result" id="out-mol" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-dil">
+      <h2 id="h-dil"></h2>
+      <p class="hint" id="hint-dil"></p>
+      <div class="row2">
+        <div class="field"><label for="c1" id="l-c1"></label><input id="c1" inputmode="decimal" value="12" dir="ltr"></div>
+        <div class="field"><label for="v1" id="l-v1"></label><input id="v1" inputmode="decimal" value="" placeholder="?" dir="ltr"></div>
+        <div class="field"><label for="c2" id="l-c2"></label><input id="c2" inputmode="decimal" value="1" dir="ltr"></div>
+        <div class="field"><label for="v2" id="l-v2"></label><input id="v2" inputmode="decimal" value="250" dir="ltr"></div>
+      </div>
+      <div class="result" id="out-dil" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <footer class="credit"><span id="t-foot"></span><span dir="ltr">&copy; 2026 <strong>Ibrahem Abdalkader</strong>. All rights reserved.</span></footer>
+</div>
+
+<script>
+(function(){
+  var MASS={H:1.008,He:4.0026,Li:6.94,Be:9.0122,B:10.81,C:12.011,N:14.007,O:15.999,F:18.998,Ne:20.18,Na:22.99,Mg:24.305,Al:26.982,Si:28.085,P:30.974,S:32.06,Cl:35.45,Ar:39.948,K:39.098,Ca:40.078,Cr:51.996,Mn:54.938,Fe:55.845,Co:58.933,Ni:58.693,Cu:63.546,Zn:65.38,Br:79.904,Ag:107.87,Sn:118.71,I:126.9,Ba:137.33,Au:196.97,Hg:200.59,Pb:207.2};
+  var T={
+    en:{
+      title:"Lab Bench",
+      sub:"Three quick calculators for general chemistry labs: molar mass, solution molarity and dilution.",
+      lang:"العربية",
+      hMM:"Molar mass",hintMM:"Type a formula. Parentheses and hydrates (·) work.",lFormula:"Chemical formula",
+      use:"Use in molarity calculator",
+      hMol:"Molarity of a solution",hintMol:"From the mass of solute and the final volume.",
+      lMass:"Mass (g)",lMM:"Molar mass (g/mol)",lVol:"Volume (mL)",
+      hDil:"Dilution (C₁V₁ = C₂V₂)",hintDil:"Leave exactly one box empty and it will be solved.",
+      lC1:"C₁ stock (M)",lV1:"V₁ stock (mL)",lC2:"C₂ final (M)",lV2:"V₂ final (mL)",
+      element:"Element",count:"Count",contrib:"g/mol",
+      molarMass:"Molar mass",moles:"Moles",molarity:"Molarity",
+      badEl:"Unknown element: ",badF:"Check the formula.",needNums:"Enter positive numbers.",
+      solveV1:"Take V₁ of stock",solveC1:"Stock concentration C₁",solveC2:"Final concentration C₂",solveV2:"Final volume V₂",
+      addWater:"Then add water up to the final volume.",
+      oneEmpty:"Leave exactly one box empty.",
+      foot:"Atomic masses are standard rounded values. Check against your lab manual before reporting results."
+    },
+    ar:{
+      title:"طاولة المعمل",
+      sub:"ثلاث حاسبات سريعة لمعامل الكيمياء العامة: الكتلة المولية، مولارية المحلول، والتخفيف.",
+      lang:"English",
+      hMM:"الكتلة المولية",hintMM:"اكتب الصيغة الكيميائية. الأقواس وماء التبلور (·) مدعومين.",lFormula:"الصيغة الكيميائية",
+      use:"استخدمها في حاسبة المولارية",
+      hMol:"مولارية المحلول",hintMol:"من كتلة المذاب والحجم النهائي.",
+      lMass:"الكتلة (جم)",lMM:"الكتلة المولية (جم/مول)",lVol:"الحجم (مل)",
+      hDil:"التخفيف (C₁V₁ = C₂V₂)",hintDil:"سيب خانة واحدة فاضية وهتتحسب لوحدها.",
+      lC1:"C₁ تركيز المحلول الأصلي (M)",lV1:"V₁ حجم الأصلي (مل)",lC2:"C₂ التركيز النهائي (M)",lV2:"V₂ الحجم النهائي (مل)",
+      element:"العنصر",count:"العدد",contrib:"جم/مول",
+      molarMass:"الكتلة المولية",moles:"عدد المولات",molarity:"المولارية",
+      badEl:"عنصر غير معروف: ",badF:"راجع الصيغة.",needNums:"اكتب أرقام موجبة.",
+      solveV1:"خد V₁ من المحلول الأصلي",solveC1:"تركيز المحلول الأصلي C₁",solveC2:"التركيز النهائي C₂",solveV2:"الحجم النهائي V₂",
+      addWater:"بعدها أضف ماء حتى الحجم النهائي.",
+      oneEmpty:"سيب خانة واحدة فقط فاضية.",
+      foot:"الكتل الذرية قيم قياسية مقربة. راجع كتاب المعمل قبل ما تسجل النتائج."
+    }
+  };
+  var lang='ar';
+  try{ var s=localStorage.getItem('labbench-lang'); if(s==='en'||s==='ar') lang=s; }catch(e){}
+
+  function $(id){return document.getElementById(id)}
+  function fmt(n,d){ if(!isFinite(n)) return '—'; return Number(n.toFixed(d==null?4:d)).toLocaleString('en-US',{maximumFractionDigits:d==null?4:d}); }
+  function num(id){ var v=$(id).value.trim().replace(',','.'); return v===''?null:parseFloat(v); }
+
+  function parsePart(s){
+    var stack=[{}],i=0;
+    function readNum(){ var m=/^\d+/.exec(s.slice(i)); if(m){i+=m[0].length;return parseInt(m[0],10);} return 1; }
+    while(i<s.length){
+      var ch=s[i];
+      if(ch==='('||ch==='['){stack.push({});i++;}
+      else if(ch===')'||ch===']'){
+        i++; var k=readNum(), top=stack.pop(); if(!stack.length) throw {bad:true};
+        for(var e in top) stack[stack.length-1][e]=(stack[stack.length-1][e]||0)+top[e]*k;
+      } else if(/[A-Z]/.test(ch)){
+        var el=ch; i++;
+        if(i<s.length && /[a-z]/.test(s[i])){el+=s[i];i++;}
+        if(!(el in MASS)) throw {el:el};
+        var n=readNum(); stack[stack.length-1][el]=(stack[stack.length-1][el]||0)+n;
+      } else throw {bad:true};
+    }
+    if(stack.length!==1) throw {bad:true};
+    return stack[0];
+  }
+  function parseFormula(f){
+    f=f.replace(/\s+/g,'').replace(/[•*]/g,'·');
+    if(!f) throw {bad:true};
+    var total={};
+    f.split('·').forEach(function(p){
+      var m=/^(\d+)(.*)$/.exec(p), k=1;
+      if(m){k=parseInt(m[1],10);p=m[2];}
+      if(!p) throw {bad:true};
+      var c=parsePart(p);
+      for(var e in c) total[e]=(total[e]||0)+c[e]*k;
+    });
+    return total;
+  }
+
+  var lastMM=null;
+  function calcMM(){
+    var t=T[lang], out=$('out-mm');
+    try{
+      var c=parseFormula($('formula').value), sum=0, rows='';
+      Object.keys(c).forEach(function(e){ var m=c[e]*MASS[e]; sum+=m; rows+='<tr><td>'+e+'</td><td>'+c[e]+'</td><td>'+fmt(m,3)+'</td></tr>'; });
+      lastMM=sum;
+      out.innerHTML='<div class="line">'+t.molarMass+'</div><div class="big" dir="ltr">'+fmt(sum,3)+' <span class="unit">g/mol</span></div>'+
+        '<table><thead><tr><th>'+t.element+'</th><th>'+t.count+'</th><th>'+t.contrib+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    }catch(e){
+      lastMM=null;
+      out.innerHTML='<div class="err">'+(e&&e.el?t.badEl+e.el:t.badF)+'</div>';
+    }
+  }
+  function calcMol(){
+    var t=T[lang], out=$('out-mol'), m=num('mass'), mm=num('mm'), v=num('vol');
+    if(!(m>0&&mm>0&&v>0)){ out.innerHTML='<div class="err">'+t.needNums+'</div>'; return; }
+    var mol=m/mm, M=mol/(v/1000);
+    out.innerHTML='<div class="line">'+t.molarity+'</div><div class="big" dir="ltr">'+fmt(M,4)+' <span class="unit">M</span></div>'+
+      '<div class="line">'+t.moles+': <span dir="ltr">'+fmt(mol,5)+' mol</span></div>';
+  }
+  function calcDil(){
+    var t=T[lang], out=$('out-dil'), ids=['c1','v1','c2','v2'], vals=ids.map(num);
+    var empty=ids.filter(function(_,i){return vals[i]===null});
+    if(empty.length!==1){ out.innerHTML='<div class="err">'+t.oneEmpty+'</div>'; return; }
+    var c1=vals[0],v1=vals[1],c2=vals[2],v2=vals[3], known=vals.filter(function(x){return x!==null});
+    if(known.some(function(x){return !(x>0)})){ out.innerHTML='<div class="err">'+t.needNums+'</div>'; return; }
+    var label,val,unit,extra='';
+    if(empty[0]==='v1'){ val=c2*v2/c1; label=t.solveV1; unit='mL'; extra='<div class="line">'+t.addWater+'</div>'; }
+    else if(empty[0]==='c1'){ val=c2*v2/v1; label=t.solveC1; unit='M'; }
+    else if(empty[0]==='c2'){ val=c1*v1/v2; label=t.solveC2; unit='M'; }
+    else { val=c1*v1/c2; label=t.solveV2; unit='mL'; }
+    out.innerHTML='<div class="line">'+label+'</div><div class="big" dir="ltr">'+fmt(val,3)+' <span class="unit">'+unit+'</span></div>'+extra;
+  }
+
+  function applyLang(){
+    var t=T[lang], d=document.documentElement;
+    d.lang=lang; d.dir=lang==='ar'?'rtl':'ltr';
+    $('t-title').textContent=t.title; $('t-sub').textContent=t.sub; $('langBtn').textContent=t.lang;
+    $('h-mm').textContent=t.hMM; $('hint-mm').textContent=t.hintMM; $('l-formula').textContent=t.lFormula; $('useMM').textContent=t.use;
+    $('h-mol').textContent=t.hMol; $('hint-mol').textContent=t.hintMol;
+    $('l-mass').textContent=t.lMass; $('l-mm').textContent=t.lMM; $('l-vol').textContent=t.lVol;
+    $('h-dil').textContent=t.hDil; $('hint-dil').textContent=t.hintDil;
+    $('l-c1').textContent=t.lC1; $('l-v1').textContent=t.lV1; $('l-c2').textContent=t.lC2; $('l-v2').textContent=t.lV2;
+    $('t-foot').textContent=t.foot;
+    calcMM(); calcMol(); calcDil();
+  }
+
+  var ex=['NaCl','H2SO4','CuSO4·5H2O','Ca(OH)2','C6H12O6','KMnO4'];
+  ex.forEach(function(f){
+    var b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=f;
+    b.addEventListener('click',function(){ $('formula').value=f; calcMM(); });
+    $('chips').appendChild(b);
+  });
+
+  $('formula').addEventListener('input',calcMM);
+  ['mass','mm','vol'].forEach(function(id){$(id).addEventListener('input',calcMol)});
+  ['c1','v1','c2','v2'].forEach(function(id){$(id).addEventListener('input',calcDil)});
+  $('useMM').addEventListener('click',function(){ if(lastMM){ $('mm').value=Number(lastMM.toFixed(3)); calcMol(); } });
+  $('langBtn').addEventListener('click',function(){
+    lang=lang==='ar'?'en':'ar';
+    try{localStorage.setItem('labbench-lang',lang)}catch(e){}
+    applyLang();
+  });
+  applyLang();
+})();
+</script>
+
+</body>
+</html>
